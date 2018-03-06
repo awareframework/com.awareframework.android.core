@@ -20,36 +20,23 @@ abstract class AccelerometerRoomDatabase : RoomDatabase() {
     abstract fun AccelerometerDeviceDao(): AccelerometerDeviceDao
 
     companion object {
-        var instance: AccelerometerRoomDatabase? = null
-            private set
-
-        fun init(context: Context, encryptionKey: String?, dbName: String) {
-            synchronized(AccelerometerRoomDatabase::class) {
-                if (instance != null) {
-                    destroyInstance()
-                }
-
-                val builder = Room.databaseBuilder(context.applicationContext,
-                        AccelerometerRoomDatabase::class.java, dbName)
-                if (encryptionKey != null) {
-                    builder.openHelperFactory(SafeHelperFactory(encryptionKey.toCharArray()))
-                }
-
-                instance = builder
-                        // TODO (sercant): handle migrations!
-                        .fallbackToDestructiveMigration()
-                        .build()
+        /**
+         * This creating instance is expensive and should be closed by calling `close()` after db is no
+         * longer needed.
+         */
+        fun getInstance(context: Context, encryptionKey: String?, dbName: String): AccelerometerRoomDatabase {
+            val builder = Room.databaseBuilder(context.applicationContext,
+                    AccelerometerRoomDatabase::class.java, dbName)
+            if (encryptionKey != null) {
+                builder.openHelperFactory(SafeHelperFactory(encryptionKey.toCharArray()))
             }
-        }
 
-        fun destroyInstance() {
-            instance?.close()
-            instance = null
-        }
-    }
+            val instance: AccelerometerRoomDatabase = builder
+                    // TODO (sercant): handle migrations!
+                    .fallbackToDestructiveMigration()
+                    .build()
 
-    fun clearAllData() {
-        AccelerometerEventDao().deleteAll()
-        AccelerometerDeviceDao().deleteAll()
+            return instance
+        }
     }
 }

@@ -18,10 +18,7 @@ import kotlin.concurrent.thread
  */
 class RoomEngine(context: Context, encryptionKey: String?, dbName: String) : DbEngine(context, encryptionKey, dbName) {
 
-    // TODO (sercant): We should hold a reference to the database object here since this class is instantiated now.
-    init {
-        AccelerometerRoomDatabase.init(context, encryptionKey, dbName)
-    }
+    var db: AccelerometerRoomDatabase? = AccelerometerRoomDatabase.getInstance(context, encryptionKey, dbName)
 
     override fun <T> save(datas: Array<T>): Thread where T: AwareObject {
         return thread {
@@ -30,7 +27,6 @@ class RoomEngine(context: Context, encryptionKey: String?, dbName: String) : DbE
                     @Suppress("UNCHECKED_CAST")
                     datas as Array<AccelerometerEvent>
 
-                    val db = AccelerometerRoomDatabase.instance
                     val data = arrayListOf<EventRoomEntity>()
                     datas.forEach { event: AccelerometerEvent ->
                         data.add(EventRoomEntity(event = event))
@@ -48,7 +44,6 @@ class RoomEngine(context: Context, encryptionKey: String?, dbName: String) : DbE
         return thread {
             try {
                 if (data is AccelerometerDevice) {
-                    val db = AccelerometerRoomDatabase.instance
                     // TODO (sercant): We don't expect to have several sensors in one device right?
                     val device = DeviceRoomEntity(0, data)
                     db!!.AccelerometerDeviceDao().insert(device)
@@ -62,8 +57,6 @@ class RoomEngine(context: Context, encryptionKey: String?, dbName: String) : DbE
 
     override fun <T> getAll(klass: Class<T>): List<T>? {
         var result: List<T>? = null
-        val db = AccelerometerRoomDatabase.instance
-
 
         when (klass) {
             AccelerometerEvent::class.java -> {
@@ -82,8 +75,8 @@ class RoomEngine(context: Context, encryptionKey: String?, dbName: String) : DbE
     override fun removeAll(): Thread {
         return thread {
             try {
-                val db = AccelerometerRoomDatabase.instance
-                db!!.clearAllData()
+                db!!.AccelerometerEventDao().deleteAll()
+                db!!.AccelerometerDeviceDao().deleteAll()
             } catch (e: SQLiteException) {
                 // TODO (sercant): user changed the password for the db. Handle it!
                 e.printStackTrace()
@@ -92,6 +85,7 @@ class RoomEngine(context: Context, encryptionKey: String?, dbName: String) : DbE
     }
 
     override fun close() {
-        AccelerometerRoomDatabase.destroyInstance()
+        db?.close()
+        db = null
     }
 }
