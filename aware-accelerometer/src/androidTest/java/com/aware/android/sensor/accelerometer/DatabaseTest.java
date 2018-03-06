@@ -36,7 +36,7 @@ public class DatabaseTest {
     private Engine encryptedEngine;
 
     @Before
-    public void initialize() throws Exception {
+    public void init() throws Exception {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
