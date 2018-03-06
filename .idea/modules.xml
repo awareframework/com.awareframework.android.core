@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/aware-accelerometer/aware-accelerometer.iml" filepath="$PROJECT_DIR$/aware-accelerometer/aware-accelerometer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aware-android.iml" filepath="$PROJECT_DIR$/aware-android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aware-sensor-core/aware-sensor-core.iml" filepath="$PROJECT_DIR$/aware-sensor-core/aware-sensor-core.iml" />
+    </modules>
+  </component>
+</project>
