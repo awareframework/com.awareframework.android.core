@@ -30,13 +30,13 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public class DatabaseTest {
 
-    static final String ENCRYPTION_KEY = "custom_key";
+    private static final String ENCRYPTION_KEY = "custom_key";
 
-    Engine engine;
-    Engine encryptedEngine;
+    private Engine engine;
+    private Engine encryptedEngine;
 
     @Before
-    public void initDatabases() throws Exception {
+    public void initialize() throws Exception {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
