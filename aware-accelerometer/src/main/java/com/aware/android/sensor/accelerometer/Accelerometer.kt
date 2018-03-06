@@ -1,4 +1,4 @@
-package com.aware.sensor.accelerometer
+package com.aware.android.sensor.accelerometer
 
 import android.Manifest
 import android.content.BroadcastReceiver
@@ -74,7 +74,7 @@ class Accelerometer private constructor(
             var bufferTimeout: Int = 30000,
             var encryptionKey: String? = null,
             var databaseType: Engine.DatabaseType = Engine.DatabaseType.NONE,
-            var databaseName: String?
+            var databaseName: String = "aware_accelerometer.db"
     )
 
     class Builder(private val context: Context) {

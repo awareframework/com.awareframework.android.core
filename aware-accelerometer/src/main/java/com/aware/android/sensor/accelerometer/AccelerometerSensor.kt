@@ -1,4 +1,4 @@
-package com.aware.sensor.accelerometer
+package com.aware.android.sensor.accelerometer
 
 import android.app.Service
 import android.content.Context
