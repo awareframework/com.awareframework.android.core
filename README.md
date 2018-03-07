@@ -18,19 +18,20 @@ In your app `build.gradle` add the dependency to the module.
 ```gradle
 dependencies {
     api project(':aware-accelerometer')
-    ...
+    ..
 }
 ```
 
 In your source code build the sensor.
 
 ```kotlin
-val accelerometer: Accelerometer = Accelerometer.Builder(applicationContext)
+val accelerometer: Accelerometer = Accelerometer.Builder(appContext)
         .setDebug(true)
-        .setDeviceID(UUID.randomUUID().toString())
-        .setSensorObserver(object : Accelerometer.SensorObserver {
-            override fun onAccelerometerChanged(data: AccelerometerEvent) {
-                Log.d("mSensorObserver", data.toString())
+        .setDeviceId(UUID.randomUUID().toString())
+        .setSensorObserver(new SensorObserver() {
+            @Override
+            public void onDataChanged(@NotNull String type, @Nullable Object data, @Nullable Object error) {
+                ..
             }
         })
         .build()
