@@ -41,22 +41,22 @@ public class DatabaseTest {
         Context appContext = InstrumentationRegistry.getTargetContext();
 
         engine = new DbEngine.Builder(appContext)
-                .setDatabaseType(Engine.DatabaseType.NONE)
+                .setDbType(Engine.DatabaseType.NONE)
                 .build();
 
         assertNull(engine);
 
         engine = new DbEngine.Builder(appContext)
-                .setDatabaseName("test.db")
-                .setDatabaseType(Engine.DatabaseType.ROOM)
+                .setDbName("test.db")
+                .setDbType(Engine.DatabaseType.ROOM)
                 .build();
 
         assertNotNull(engine);
 
         encryptedEngine = new DbEngine.Builder(appContext)
-                .setDatabaseName("test_encrypted.db")
-                .setDatabaseType(Engine.DatabaseType.ROOM)
-                .setEncryptionKey(ENCRYPTION_KEY)
+                .setDbName("test_encrypted.db")
+                .setDbType(Engine.DatabaseType.ROOM)
+                .setDbKey(ENCRYPTION_KEY)
                 .build();
 
         assertNotNull(engine);

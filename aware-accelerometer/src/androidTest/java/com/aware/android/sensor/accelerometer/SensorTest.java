@@ -5,8 +5,10 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.aware.android.sensor.accelerometer.model.AccelerometerEvent;
+import com.aware.android.sensor.core.model.SensorObserver;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +16,7 @@ import org.junit.runner.RunWith;
 
 import java.util.UUID;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -38,10 +41,10 @@ public class SensorTest {
 
         sensor = new Accelerometer.Builder(appContext)
                 .setDebug(true)
-                .setDeviceID(UUID.randomUUID().toString())
-                .setSensorObserver(new Accelerometer.SensorObserver() {
+                .setDeviceId(UUID.randomUUID().toString())
+                .setSensorObserver(new SensorObserver() {
                     @Override
-                    public void onAccelerometerChanged(@NotNull AccelerometerEvent data) {
+                    public void onDataChanged(@NotNull String type, @Nullable Object data, @Nullable Object error) {
                         wasAbleToLogEvents = true;
                     }
                 })
@@ -59,9 +62,17 @@ public class SensorTest {
         // can we run a sensor after stopping it
         sensor.stop();
         Thread.sleep(1000);
+        sensor.start();
+        Thread.sleep(1000);
+
+        sensor.stop();
+        Thread.sleep(1000);
 
         wasAbleToLogEvents = false;
+        Thread.sleep(1000);
+        assertFalse(wasAbleToLogEvents);
 
+        wasAbleToLogEvents = false;
         sensor.start();
         Thread.sleep(10000);
         assertTrue(wasAbleToLogEvents);
@@ -72,7 +83,7 @@ public class SensorTest {
     public void testStartSensor() throws Exception {
         // can we log any events?
         wasAbleToLogEvents = false;
-        
+
         sensor.start();
         Thread.sleep(10000);
         assertTrue(wasAbleToLogEvents);

@@ -1,15 +1,12 @@
 package com.aware.android.sensor.accelerometer
 
-import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
-import android.support.v4.content.ContextCompat
-import android.util.Log
 import com.aware.android.sensor.core.db.Engine
-import com.aware.android.sensor.accelerometer.model.AccelerometerEvent
+import com.aware.android.sensor.core.model.SensorConfig
+import com.aware.android.sensor.core.model.SensorObserver
 
 
 /**
@@ -24,13 +21,15 @@ class Accelerometer private constructor(
 ) : BroadcastReceiver() {
 
     companion object {
-        val ACTION_AWARE_ACCELEROMETER_START = "ACTION_AWARE_ACCELEROMETER_START"
-        val ACTION_AWARE_ACCELEROMETER_STOP = "ACTION_AWARE_ACCELEROMETER_STOP"
+        const val ACTION_AWARE_ACCELEROMETER_START = "ACTION_AWARE_ACCELEROMETER_START"
+        const val ACTION_AWARE_ACCELEROMETER_STOP = "ACTION_AWARE_ACCELEROMETER_STOP"
 
-        val ACTION_AWARE_ACCELEROMETER = "ACTION_AWARE_ACCELEROMETER"
+        const val ACTION_AWARE_ACCELEROMETER = "ACTION_AWARE_ACCELEROMETER"
 
-        val ACTION_AWARE_ACCELEROMETER_LABEL = "ACTION_AWARE_ACCELEROMETER_LABEL"
-        val EXTRA_LABEL = "label"
+        const val ACTION_AWARE_ACCELEROMETER_LABEL = "ACTION_AWARE_ACCELEROMETER_LABEL"
+        const val EXTRA_LABEL = "label"
+
+        const val DATA_TYPE = "DATA_ACCELEROMETER"
 
         val defaultConfig: AccelerometerConfig = AccelerometerConfig()
     }
@@ -40,62 +39,86 @@ class Accelerometer private constructor(
     var config: AccelerometerConfig = config
         private set
 
-    interface SensorObserver {
-        fun onAccelerometerChanged(data: AccelerometerEvent)
-    }
-
     data class AccelerometerConfig(
             /**
-             * Accelerometer frequency in microseconds: e.g.,
+             * Accelerometer frequency in hertz per second: e.g.,
              * 0 - fastest
-             * 20000 - game
-             * 60000 - UI
-             * 200000 - normal (default)
+             * 1 - sample per second
+             * 5 - sample per second
+             * 20 - sample per second
              */
-            var frequency: Int = 200000,
+            var frequency: Int = 0,
 
             /**
-             * Accelerometer threshold (float).  Do not record consecutive points if
-             * change in value of all axes is less than this.
+             * Period to save data in minutes. (optional)
              */
-            var threshold: Float = 0f,
+            var period: Float = 1f,
 
-            /**
-             * Discard sensor events that come in more often than frequency
-             */
-            var enforceFrequency: Boolean = false,
-//            var debugDbSlow: Boolean = false,
-            var sensorObserver: SensorObserver? = null,
-            var deviceID: String = "",
-            var label: String = "",
-            var debug: Boolean = false,
-            var wakeLockEnabled: Boolean = false,
-            var bufferSize: Int = 250,
-            var bufferTimeout: Int = 30000,
-            var encryptionKey: String? = null,
-            var databaseType: Engine.DatabaseType = Engine.DatabaseType.NONE,
-            var databaseName: String = "aware_accelerometer.db"
-    )
+            // TODO (sercant): enable if needed after meeting.
+//            /**
+//             * Accelerometer threshold (float).  Do not record consecutive points if
+//             * change in value of all axes is less than this.
+//             */
+//            var threshold: Float = 0f,
+
+            var sensorObserver: SensorObserver? = null
+
+//            var wakeLockEnabled: Boolean = false,
+
+    ) : SensorConfig(dbName = "aware_accelerometer.db")
 
     class Builder(private val context: Context) {
 
         private val config: AccelerometerConfig = AccelerometerConfig()
 
+        /**
+         * @param frequency sample count per second in hertz. (*fastest• default = 0)
+         */
         fun setFrequency(frequency: Int) = apply { config.frequency = frequency }
-        fun setThreshold(threshold: Float) = apply { config.threshold = threshold }
-        fun setEnforceFrequency(enforceFrequency: Boolean) = apply { config.enforceFrequency = enforceFrequency }
+        //        fun setThreshold(threshold: Float) = apply { config.threshold = threshold }
+//        fun setEnforceFrequency(enforceFrequency: Boolean) = apply { config.enforceFrequency = enforceFrequency }
         //        fun setDebugDBSlow(debugDBSlow: Boolean) = apply { config.debugDbSlow = debugDBSlow }
+
+        /**
+         * @param sensorObserver callback for live data updates.
+         */
         fun setSensorObserver(sensorObserver: SensorObserver) = apply { config.sensorObserver = sensorObserver }
 
-        fun setDeviceID(deviceID: String) = apply { config.deviceID = deviceID }
-        fun setLabel(dataLabel: String) = apply { config.label = dataLabel }
-        fun setDebug(debug: Boolean) = apply { config.debug = debug }
-        fun setWakeLock(wakeLock: Boolean) = apply { config.wakeLockEnabled = wakeLock }
-        fun setBufferSize(bufferSize: Int) = apply { config.bufferSize = bufferSize }
-        fun setBufferTimeout(bufferTimeout: Int) = apply { config.bufferTimeout = bufferTimeout }
-        fun setDatabasePassword(password: String) = apply { config.encryptionKey = password }
-        fun setDatabaseType(type: Engine.DatabaseType) = apply { config.databaseType = type }
+        /**
+         * @param deviceId id of the device that will be associated with the events and the sensor. (default = "")
+         */
+        fun setDeviceId(deviceId: String) = apply { config.deviceId = deviceId }
 
+        /**
+         * @param label collected data will be labeled accordingly. (default = "")
+         */
+        fun setLabel(label: String) = apply { config.label = label }
+
+        /**
+         * @param debug enable/disable logging to Logcat. (default = false)
+         */
+        fun setDebug(debug: Boolean) = apply { config.debug = debug }
+        //        fun setWakeLock(wakeLock: Boolean) = apply { config.wakeLockEnabled = wakeLock }
+//        fun setBufferSize(bufferSize: Int) = apply { config.bufferSize = bufferSize }
+
+        /**
+         * @param period period of database saves in minutes. (default = 1.0)
+         */
+        fun setPeriod(period: Float) = apply { config.period = period }
+
+        /**
+         * @param key encryption key for the database. (default = no encryption)
+         */
+        fun setDbKey(key: String) = apply { config.dbKey = key }
+
+        /**
+         * @param type which db engine to use for saving data. (default = NONE)
+         */
+        fun setDbType(type: Engine.DatabaseType) = apply { config.dbType = type }
+
+        /**
+         * Returns the accelerometer with the built configuration.
+         */
         fun build(): Accelerometer = Accelerometer(context, config)
     }
 
@@ -113,12 +136,12 @@ class Accelerometer private constructor(
         this.config = config
         AccelerometerSensor.CONFIG = config
 
-        if (config.wakeLockEnabled and (ContextCompat.checkSelfPermission(context, Manifest.permission.WAKE_LOCK) != PackageManager.PERMISSION_GRANTED)) {
-            Log.e(TAG, "Permission for the WAKE_LOCK is not granted!")
-        } else {
-            val intent = Intent(context, AccelerometerSensor::class.java)
-            context.startService(intent)
-        }
+//        if (config.wakeLockEnabled and (ContextCompat.checkSelfPermission(context, Manifest.permission.WAKE_LOCK) != PackageManager.PERMISSION_GRANTED)) {
+//            Log.e(TAG, "Permission for the WAKE_LOCK is not granted!")
+//        } else {
+        val intent = Intent(context, AccelerometerSensor::class.java)
+        context.startService(intent)
+//        }
     }
 
     fun stop() {

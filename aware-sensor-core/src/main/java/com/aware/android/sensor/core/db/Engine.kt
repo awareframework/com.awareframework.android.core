@@ -26,9 +26,9 @@ abstract class Engine(
         protected var encryptionKey: String? = null
         protected var dbName: String = "aware_database.db"
 
-        fun setDatabaseType(type: DatabaseType) = apply { this.type = type }
-        fun setEncryptionKey(encryptionKey: String?) = apply { this.encryptionKey = encryptionKey }
-        fun setDatabaseName(name: String) = apply { this.dbName = name }
+        fun setDbType(type: DatabaseType) = apply { this.type = type }
+        fun setDbKey(encryptionKey: String?) = apply { this.encryptionKey = encryptionKey }
+        fun setDbName(name: String) = apply { this.dbName = name }
 
         abstract fun build(): Engine?
     }
