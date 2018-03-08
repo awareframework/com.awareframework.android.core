@@ -11,23 +11,19 @@ This repository contains the the core classes to use while implementing an aware
 
 ## Example usage
 
-In your aware module root `build.gradle` file add the jitpack repository.
- 
+In your root `build.gradle` add the jitpack repository.
 ```gradle
-repositories {
-    // Other repositories..
-    
-    maven { url "https://jitpack.io" }
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
 }
 ```
-
-In your library `build.gradle` add the dependency to the core.
+In your app `build.gradle` add the dependency to the accelerometer.
 
 ```gradle
-
 dependencies {
-    implementation 'com.github.awareframework:android-core:master-SNAPSHOT'
-
-    // Other dependencies..
+    compile 'com.github.awareframework:com.aware.android.core:-SNAPSHOT'
 }
 ```
