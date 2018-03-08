@@ -7,6 +7,9 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 # AWARE Accelerometer
 
+[![Release](https://jitpack.io/v/User/Repo.svg)]
+(https://jitpack.io/#aware-team/aware-accelerometer)
+
 **This repository is under development and not ready for use yet.**
 
 This repository is a modularized version of the [AWARE](https://github.com/denzilferreira/aware-client) framework.
