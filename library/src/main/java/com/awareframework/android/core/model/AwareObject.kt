@@ -1,4 +1,4 @@
-package com.aware.android.sensor.core.model
+package com.awareframework.android.core.model
 
 import com.google.gson.Gson
 import java.util.*

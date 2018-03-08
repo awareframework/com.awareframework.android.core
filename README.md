@@ -7,33 +7,27 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 # AWARE Android
 
-**This repository is under development and not ready for use yet.**
-
-This repository contains the the modules for each aware sensors. 
+This repository contains the the core classes to use while implementing an aware module. 
 
 ## Example usage
 
-In your app `build.gradle` add the dependency to the module.
-
+In your aware module root `build.gradle` file add the jitpack repository.
+ 
 ```gradle
-dependencies {
-    api project(':aware-accelerometer')
-
-    // Other dependencies..
+repositories {
+    // Other repositories..
+    
+    maven { url "https://jitpack.io" }
 }
 ```
 
-In your source code build the sensor.
+In your library `build.gradle` add the dependency to the core.
 
-```kotlin
-val accelerometer = Accelerometer.Builder(appContext)
-        .setDebug(true)
-        .setDeviceId(UUID.randomUUID().toString())
-        .setSensorObserver(object : SensorObserver {
-            override fun onDataChanged(type: String, data: Any?, error: Any?) {
-                // Your code here..
-            }
-        })
-        .build()
-accelerometer.start()
+```gradle
+
+dependencies {
+    implementation 'com.github.awareframework:android-core:master-SNAPSHOT'
+
+    // Other dependencies..
+}
 ```

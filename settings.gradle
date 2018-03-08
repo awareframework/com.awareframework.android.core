@@ -1,1 +1,1 @@
-include ':aware-sensor-core', ':aware-accelerometer'
+include ':library'

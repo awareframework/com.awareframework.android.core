@@ -1,4 +1,4 @@
-package com.aware.android.sensor.core
+package com.awareframework.android.core
 
 import android.app.Service
 import android.hardware.SensorEventListener

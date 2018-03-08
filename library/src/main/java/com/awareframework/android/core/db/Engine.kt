@@ -1,7 +1,7 @@
-package com.aware.android.sensor.core.db
+package com.awareframework.android.core.db
 
 import android.content.Context
-import com.aware.android.sensor.core.model.AwareObject
+import com.awareframework.android.core.model.AwareObject
 
 
 /**

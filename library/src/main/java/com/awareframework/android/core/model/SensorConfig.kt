@@ -1,6 +1,6 @@
-package com.aware.android.sensor.core.model
+package com.awareframework.android.core.model
 
-import com.aware.android.sensor.core.db.Engine
+import com.awareframework.android.core.db.Engine
 
 /**
  * Class decription
@@ -10,6 +10,11 @@ import com.aware.android.sensor.core.db.Engine
  */
 
 open class SensorConfig(
+        /**
+         * Sensor is enabled or not. (optional)
+         */
+        var enabled: Boolean = false,
+
         /**
          * Enables logging. (optional)
          */
