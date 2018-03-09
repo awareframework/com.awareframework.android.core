@@ -5,7 +5,6 @@ buildscript {
     repositories {
         google()
         jcenter()
-        maven { url "https://jitpack.io" }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
@@ -32,6 +31,8 @@ allprojects {
         target_sdk = (System.getenv("target_sdk") as Integer ?: 25)
         minimum_sdk = (System.getenv("minimum_sdk") as Integer ?: 19) //Android 4.4+
         build_tools = (System.getenv("build_tools") ?: "26.0.2")
+        saferoom = System.getenv("saferoom") ?: "0.3.2"
+        room = System.getenv("room") ?: "1.0.0"
     }
 }
 

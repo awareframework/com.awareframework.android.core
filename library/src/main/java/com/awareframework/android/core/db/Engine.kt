@@ -1,6 +1,7 @@
 package com.awareframework.android.core.db
 
 import android.content.Context
+import com.awareframework.android.core.model.AwareData
 import com.awareframework.android.core.model.AwareObject
 
 
@@ -11,9 +12,9 @@ import com.awareframework.android.core.model.AwareObject
  * @date 15/02/2018
  */
 abstract class Engine(
-        private val context: Context,
-        private val encryptionKey: String?,
-        private val dbName: String
+        protected val context: Context,
+        protected val encryptionKey: String?,
+        protected val dbName: String
 ) {
 
     enum class DatabaseType {
@@ -21,7 +22,7 @@ abstract class Engine(
         NONE
     }
 
-    abstract class Builder(val context: Context) {
+    class Builder(val context: Context) {
         protected var type: DatabaseType = DatabaseType.NONE
         protected var encryptionKey: String? = null
         protected var dbName: String = "aware_database.db"
@@ -30,13 +31,18 @@ abstract class Engine(
         fun setDbKey(encryptionKey: String?) = apply { this.encryptionKey = encryptionKey }
         fun setDbName(name: String) = apply { this.dbName = name }
 
-        abstract fun build(): Engine?
+        fun build(): Engine? {
+            return when (type) {
+                DatabaseType.ROOM -> RoomEngine(context, encryptionKey, dbName)
+                DatabaseType.NONE -> null
+            }
+        }
     }
 
-    abstract fun <T> getAll(klass: Class<T>): List<T>?
+    abstract fun getAll(tableName: String): List<AwareData>?
 
-    abstract fun <T> save(datas: Array<T>) : Thread where T: AwareObject
-    abstract fun <T> save(data: T): Thread where T: AwareObject
+    abstract fun save(datas: Array<AwareObject>, tableName: String = this.dbName) : Thread
+    abstract fun save(data: AwareObject, tableName: String = this.dbName): Thread
     abstract fun removeAll(): Thread
     abstract fun close()
 }
