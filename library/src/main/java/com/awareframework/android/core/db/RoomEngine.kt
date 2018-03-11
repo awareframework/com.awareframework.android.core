@@ -18,7 +18,7 @@ class RoomEngine(context: Context, encryptionKey: String?, dbName: String) : Eng
 
     var db: AwareRoomDatabase? = AwareRoomDatabase.getInstance(context, encryptionKey, dbName)
 
-    override fun save(datas: Array<AwareObject>, tableName: String): Thread {
+    override fun save(datas: List<AwareObject>, tableName: String): Thread {
         return thread {
             try {
                 val data = arrayListOf<AwareDataEntity>()
