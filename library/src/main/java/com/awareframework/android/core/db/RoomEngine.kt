@@ -18,7 +18,7 @@ class RoomEngine(context: Context, encryptionKey: String?, dbName: String) : Eng
 
     var db: AwareRoomDatabase? = AwareRoomDatabase.getInstance(context, encryptionKey, dbName)
 
-    override fun save(datas: List<AwareObject>, tableName: String): Thread {
+    override fun <T> save(datas: List<T>, tableName: String) : Thread where T : AwareObject {
         return thread {
             try {
                 val data = arrayListOf<AwareDataEntity>()
@@ -33,7 +33,7 @@ class RoomEngine(context: Context, encryptionKey: String?, dbName: String) : Eng
         }
     }
 
-    override fun save(data: AwareObject, tableName: String): Thread {
+    override fun <T> save(data: T, tableName: String): Thread where T : AwareObject {
         return thread {
             try {
                 db!!.AwareDataDao().insert(AwareDataEntity(data = AwareData(data,  tableName)))

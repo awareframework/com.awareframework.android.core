@@ -41,8 +41,8 @@ abstract class Engine(
 
     abstract fun getAll(tableName: String): List<AwareData>?
 
-    abstract fun save(datas: List<AwareObject>, tableName: String = this.dbName) : Thread
-    abstract fun save(data: AwareObject, tableName: String = this.dbName): Thread
+    abstract fun <T> save(datas: List<T>, tableName: String = this.dbName) : Thread where T : AwareObject
+    abstract fun <T> save(data: T, tableName: String = this.dbName): Thread where T : AwareObject
     abstract fun removeAll(): Thread
     abstract fun close()
 }
