@@ -18,14 +18,16 @@ class RoomEngine(context: Context, encryptionKey: String?, dbName: String) : Eng
 
     var db: AwareRoomDatabase? = AwareRoomDatabase.getInstance(context, encryptionKey, dbName)
 
-    override fun <T> save(datas: List<T>, tableName: String) : Thread where T : AwareObject {
+    override fun <T : AwareObject> save(data: Array<T>, tableName: String?): Thread {
         return thread {
             try {
-                val data = arrayListOf<AwareDataEntity>()
-                datas.forEach {
-                    data.add(AwareDataEntity(data = AwareData(it,  tableName)))
+                val table = if (tableName != null) tableName else dbName
+
+                val awareData = arrayListOf<AwareDataEntity>()
+                data.forEach {
+                    awareData.add(AwareDataEntity(data = AwareData(it,  table)))
                 }
-                db!!.AwareDataDao().insertAll(data.toTypedArray())
+                db!!.AwareDataDao().insertAll(awareData.toTypedArray())
             } catch (e: SQLiteException) {
                 // TODO (sercant): user changed the password for the db. Handle it!
                 e.printStackTrace()
@@ -33,10 +35,11 @@ class RoomEngine(context: Context, encryptionKey: String?, dbName: String) : Eng
         }
     }
 
-    override fun <T> save(data: T, tableName: String): Thread where T : AwareObject {
+    override fun <T : AwareObject> save(data: T, tableName: String?, id: Long?): Thread {
         return thread {
             try {
-                db!!.AwareDataDao().insert(AwareDataEntity(data = AwareData(data,  tableName)))
+                val table = if (tableName != null) tableName else dbName
+                db!!.AwareDataDao().insert(AwareDataEntity(id = id, data = AwareData(data,  table)))
             } catch (e: SQLiteException) {
                 // TODO (sercant): user changed the password for the db. Handle it!
                 e.printStackTrace()
