@@ -5,6 +5,7 @@ import android.arch.persistence.room.Room
 import android.arch.persistence.room.RoomDatabase
 import android.content.Context
 import com.commonsware.cwac.saferoom.SafeHelperFactory
+import java.util.*
 
 /**
  * Room database class.
@@ -19,21 +20,36 @@ abstract class AwareRoomDatabase : RoomDatabase() {
     abstract fun AwareDataDao(): AwareDataDao
 
     companion object {
+        var activeDbMap: WeakHashMap<String, AwareRoomDatabase> = WeakHashMap()
+
         /**
          * This creating instance is expensive and should be closed by calling `close()` after db is no
          * longer needed.
          */
         fun getInstance(context: Context, encryptionKey: String?, dbName: String): AwareRoomDatabase {
-            val builder = Room.databaseBuilder(context.applicationContext,
-                    AwareRoomDatabase::class.java, dbName)
-            if (encryptionKey != null) {
-                builder.openHelperFactory(SafeHelperFactory(encryptionKey.toCharArray()))
+            var instance = activeDbMap[dbName]
+
+            if (instance?.isOpen == false) {
+                activeDbMap[dbName] = null
+                instance = null
             }
 
-            return builder
-                    // TODO (sercant): handle migrations!
-                    .fallbackToDestructiveMigration()
-                    .build()
+            if (instance == null) {
+                val builder = Room.databaseBuilder(context.applicationContext,
+                        AwareRoomDatabase::class.java, dbName)
+                if (encryptionKey != null) {
+                    builder.openHelperFactory(SafeHelperFactory(encryptionKey.toCharArray()))
+                }
+                instance = builder
+                        // TODO (sercant): handle migrations!
+                        .fallbackToDestructiveMigration()
+                        .build()
+
+                activeDbMap[dbName] = instance
+            }
+
+            return instance
         }
     }
+
 }
