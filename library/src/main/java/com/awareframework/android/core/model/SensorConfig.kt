@@ -1,5 +1,6 @@
 package com.awareframework.android.core.model
 
+import android.content.Context
 import com.awareframework.android.core.db.Engine
 
 /**
@@ -10,39 +11,74 @@ import com.awareframework.android.core.db.Engine
  */
 
 open class SensorConfig(
-        /**
-         * Sensor is enabled or not. (optional)
-         */
-        var enabled: Boolean = false,
+    /**
+     * Sensor is enabled or not. (optional)
+     */
+    var enabled: Boolean = false,
+
+    /**
+     * Enables logging. (optional)
+     */
+    var debug: Boolean = false,
+
+    /**
+     * Label for the data. (optional)
+     */
+    var label: String = "",
+
+    /**
+     * User given deviceId. (optional)
+     */
+    var deviceId: String = "",
 
         /**
-         * Enables logging. (optional)
-         */
-        var debug: Boolean = false,
+     * Encryption key for the database. (optional)
+     */
+    var dbEncryptionKey: String? = null,
+
+    /**
+     * Which database to use. (optional)
+     * defaults to NONE, which doesn't preserve any data.
+     */
+    var dbType: Engine.DatabaseType = Engine.DatabaseType.NONE,
+
+    /**
+     * Database name/path. (optional)? TODO (sercant): discuss
+     */
+    var dbPath: String = "aware",
+
+    /**
+     * Database sync host. (optional)
+     */
+    var dbHost: String? = null
+) {
+     abstract class Builder<T: SensorConfig>(val context: Context) {
 
         /**
-         * Label for the data. (optional)
+         * @param label collected data will be labeled accordingly. (default = "")
          */
-        var label: String = "",
+        fun setLabel(label: String) = apply { getConfig().label = label }
 
         /**
-         * User given deviceId. (optional)
+         * @param debug enable/disable logging to Logcat. (default = false)
          */
-        var deviceId: String = "",
+        fun setDebug(debug: Boolean) = apply { getConfig().debug = debug }
 
-        /**
-         * Encryption key for the database. (optional)
-         */
-        var dbKey: String? = null,
+         /**
+          * @param key encryption key for the database. (default = no encryption)
+          */
+         fun setDatabaseEncryptionKey(key: String) = apply { getConfig().dbEncryptionKey = key }
 
-        /**
-         * Which database to use. (optional)
-         * defaults to NONE, which doesn't preserve any data.
-         */
-        var dbType: Engine.DatabaseType = Engine.DatabaseType.NONE,
+         /**
+          * @param host host for syncing the database. (default = null)
+          */
+         fun setDatabaseHost(host: String) = apply { getConfig().dbHost = host }
 
-        /**
-         * Database name/path. (optional)? TODO (sercant): discuss
-         */
-        var dbName: String = "aware.db"
-)
+         /**
+          * @param type which db engine to use for saving data. (default = NONE)
+          */
+         fun setDatabaseType(type: Engine.DatabaseType) = apply { getConfig().dbType = type }
+
+         protected abstract fun getConfig(): T
+    }
+}

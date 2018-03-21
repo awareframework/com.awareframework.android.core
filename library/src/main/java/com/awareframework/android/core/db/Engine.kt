@@ -13,8 +13,9 @@ import com.awareframework.android.core.model.AwareObject
  */
 abstract class Engine(
         protected val context: Context,
-        protected val encryptionKey: String?,
-        protected val dbName: String
+        protected val path: String,
+        protected val host: String?,
+        protected val encryptionKey: String?
 ) {
 
     enum class DatabaseType {
@@ -25,15 +26,17 @@ abstract class Engine(
     class Builder(val context: Context) {
         protected var type: DatabaseType = DatabaseType.NONE
         protected var encryptionKey: String? = null
-        protected var dbName: String = "aware_database.db"
+        protected var host: String? = null
+        protected var path: String = "aware_database.db"
 
-        fun setDbType(type: DatabaseType) = apply { this.type = type }
-        fun setDbKey(encryptionKey: String?) = apply { this.encryptionKey = encryptionKey }
-        fun setDbName(name: String) = apply { this.dbName = name }
+        fun setType(type: DatabaseType) = apply { this.type = type }
+        fun setEncryptionKey(encryptionKey: String?) = apply { this.encryptionKey = encryptionKey }
+        fun setPath(path: String) = apply { this.path = path }
+        fun setHost(host: String?) = apply { this.host = host }
 
         fun build(): Engine? {
             return when (type) {
-                DatabaseType.ROOM -> RoomEngine(context, encryptionKey, dbName)
+                DatabaseType.ROOM -> RoomEngine(context, path, host, encryptionKey)
                 DatabaseType.NONE -> null
             }
         }

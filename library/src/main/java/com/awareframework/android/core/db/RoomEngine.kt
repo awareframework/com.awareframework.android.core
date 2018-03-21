@@ -14,14 +14,24 @@ import kotlin.concurrent.thread
  * @author  sercant
  * @date 19/02/2018
  */
-class RoomEngine(context: Context, encryptionKey: String?, dbName: String) : Engine(context, encryptionKey, dbName) {
+class RoomEngine(
+        context: Context,
+        path: String,
+        host: String?,
+        encryptionKey: String?
+) : Engine(
+        context,
+        path,
+        host,
+        encryptionKey
+) {
 
-    var db: AwareRoomDatabase? = AwareRoomDatabase.getInstance(context, encryptionKey, dbName)
+    var db: AwareRoomDatabase? = AwareRoomDatabase.getInstance(context, encryptionKey, path)
 
     override fun <T : AwareObject> save(data: Array<T>, tableName: String?): Thread {
         return thread {
             try {
-                val table = if (tableName != null) tableName else dbName
+                val table = if (tableName != null) tableName else path
 
                 val awareData = arrayListOf<AwareDataEntity>()
                 data.forEach {
@@ -38,7 +48,7 @@ class RoomEngine(context: Context, encryptionKey: String?, dbName: String) : Eng
     override fun <T : AwareObject> save(data: T, tableName: String?, id: Long?): Thread {
         return thread {
             try {
-                val table = if (tableName != null) tableName else dbName
+                val table = if (tableName != null) tableName else path
                 db!!.AwareDataDao().insert(AwareDataEntity(id = id, data = AwareData(data,  table)))
             } catch (e: SQLiteException) {
                 // TODO (sercant): user changed the password for the db. Handle it!
