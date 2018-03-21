@@ -51,34 +51,4 @@ open class SensorConfig(
      * Database sync host. (optional)
      */
     var dbHost: String? = null
-) {
-     abstract class Builder<T: SensorConfig>(val context: Context) {
-
-        /**
-         * @param label collected data will be labeled accordingly. (default = "")
-         */
-        fun setLabel(label: String) = apply { getConfig().label = label }
-
-        /**
-         * @param debug enable/disable logging to Logcat. (default = false)
-         */
-        fun setDebug(debug: Boolean) = apply { getConfig().debug = debug }
-
-         /**
-          * @param key encryption key for the database. (default = no encryption)
-          */
-         fun setDatabaseEncryptionKey(key: String) = apply { getConfig().dbEncryptionKey = key }
-
-         /**
-          * @param host host for syncing the database. (default = null)
-          */
-         fun setDatabaseHost(host: String) = apply { getConfig().dbHost = host }
-
-         /**
-          * @param type which db engine to use for saving data. (default = NONE)
-          */
-         fun setDatabaseType(type: Engine.DatabaseType) = apply { getConfig().dbType = type }
-
-         protected abstract fun getConfig(): T
-    }
-}
+)
