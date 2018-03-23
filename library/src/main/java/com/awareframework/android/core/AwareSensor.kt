@@ -9,7 +9,7 @@ import com.awareframework.android.core.db.Engine
 
 
 /**
- * Class decription
+ * Base sensor class for aware modules.
  *
  * @author  sercant
  * @date 05/03/2018
@@ -36,7 +36,7 @@ abstract class AwareSensor : Service() {
         sensorSyncReceiver = null
     }
 
-    fun onSync(intent: Intent?) {
+    open fun onSync(intent: Intent?) {
         // TODO (sercant): pass parameters directly to this function instead of passing intent
         // TODO (sercant): parameters needs to be passed to the engine too.
 //        dbEngine?.sync()

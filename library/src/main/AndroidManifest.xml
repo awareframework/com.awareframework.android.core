@@ -1,2 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.awareframework.android.core" />
+    package="com.awareframework.android.core" >
+
+    <application>
+        <service android:name=".manager.DbSyncManager$DbSyncManagerService"/>
+    </application>
+</manifest>

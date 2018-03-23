@@ -5,16 +5,15 @@ import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.os.Handler
-import android.os.IBinder
-import android.util.Log
-import com.awareframework.android.core.AwareSensor
-import android.os.BatteryManager
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
+import android.os.BatteryManager
+import android.os.Handler
+import android.os.IBinder
 import android.support.v4.content.ContextCompat
-
+import android.util.Log
+import com.awareframework.android.core.AwareSensor
 
 /**
  * Class to broadcast sync events
@@ -29,6 +28,8 @@ class DbSyncManager private constructor(
 ) {
 
     companion object {
+        const val TAG: String = "com.aware.manager.sync"
+
         internal fun startService(context: Context) {
             val intent = Intent(context, DbSyncManagerService::class.java)
             context.startService(intent)
@@ -41,6 +42,9 @@ class DbSyncManager private constructor(
 
     fun start() {
         DbSyncManagerService.CONFIG = config
+
+        logd("Starting DbSyncManagerService with config:\n" + config.toString())
+
         startService(context)
     }
 
@@ -50,29 +54,35 @@ class DbSyncManager private constructor(
 
 
     fun stop() {
+        logd("Stopping DbSyncManagerService.")
+
         stopService(context)
     }
 
     data class DbSyncManagerConfig(
             /**
-             * Sync interval in minutes
+             * Sync interval in minutes (default = 1)
              */
             var syncInterval: Float = 1f,
 
             /**
-             * Sync only while connected to wifi
+             * Sync only while connected to wifi (default = true)
              */
             var wifiOnly: Boolean = true,
 
             /**
-             * Sync only while device is charging
+             * Sync only while device is charging (default = false)
              */
-            var batteryChargingOnly: Boolean = false
+            var batteryChargingOnly: Boolean = false,
+
+            /**
+             * Enable/disable logs to logcat. (default = false)
+             */
+            var debug: Boolean = false
     ) {
         fun isWifiOnly(): Boolean = wifiOnly
         fun isBatteryChargingOnly(): Boolean = batteryChargingOnly
-        internal val intervalInMili: Long
-            get() = syncInterval.toLong()
+        fun intervalInMiliseconds(): Long = (syncInterval * 1000 * 60).toLong()
 
     }
 
@@ -82,14 +92,13 @@ class DbSyncManager private constructor(
         fun setSyncInterval(interval: Float) = apply { config.syncInterval = interval }
         fun setWifiOnly(wifiOnly: Boolean) = apply { config.wifiOnly = wifiOnly }
         fun setBatteryChargingOnly(batteryChargingOnly: Boolean) = apply { config.batteryChargingOnly = batteryChargingOnly }
+        fun setDebug(debug: Boolean) = apply { config.debug = debug }
         fun build(): DbSyncManager = DbSyncManager(config, context)
     }
 
     class DbSyncManagerService: Service() {
 
         companion object {
-            const val TAG: String = "com.aware.manager.sync"
-
             var instance: DbSyncManagerService? = null
             var CONFIG: DbSyncManagerConfig = DbSyncManagerConfig()
         }
@@ -111,25 +120,42 @@ class DbSyncManager private constructor(
             super.onCreate()
 
             if (instance != null) {
-                Log.w(TAG, "Sync instance is already running?")
+                logw("Sync instance is already running?")
             }
+
+            logd( "Sync service with interval: " + CONFIG.intervalInMiliseconds() + " ms created.")
 
             instance = this
             handler = Handler()
-            handler!!.postDelayed(runnable, CONFIG.intervalInMili)
+            handler!!.postDelayed(runnable, CONFIG.intervalInMiliseconds())
         }
 
         internal fun onHandle(force: Boolean = false) {
             // TODO (sercant): put configuration into the intent
+
+            logd( "Attempting to sync.")
+
             var shouldBroadcast = true
-            if (CONFIG.wifiOnly) shouldBroadcast = shouldBroadcast && isWifiConnected()
-            if (CONFIG.batteryChargingOnly) shouldBroadcast = shouldBroadcast && isCharging()
+            if (CONFIG.wifiOnly && !isWifiConnected()) {
+                shouldBroadcast = false
+
+                logd( "Wifi is not connected aborting sync.")
+            }
+
+
+            if (CONFIG.batteryChargingOnly && !isCharging()) {
+                shouldBroadcast = false
+
+                logd( "Battery is not charging aborting sync.")
+            }
 
             if (shouldBroadcast) {
                 sendBroadcast(Intent(AwareSensor.SensorSyncReceiver.SYNC))
+
+                logd("Sending sync broadcast!")
             }
 
-            handler?.postDelayed(runnable, CONFIG.intervalInMili)
+            handler?.postDelayed(runnable, CONFIG.intervalInMiliseconds())
         }
 
         private fun isCharging(): Boolean {
@@ -146,8 +172,17 @@ class DbSyncManager private constructor(
                 activeNetwork != null && activeNetwork.type == ConnectivityManager.TYPE_WIFI && activeNetwork.isConnected
             } else {
                 // TODO (sercant): if we don't have the permission just try syncing anyways?
+                logw("Can't get wifi state. Required permission is not granted!")
                 true
             }
         }
     }
+}
+
+private fun logd(msg: String){
+    if (DbSyncManager.DbSyncManagerService.CONFIG.debug) Log.d(DbSyncManager.TAG, msg)
+}
+
+private fun logw(msg: String){
+    Log.w(DbSyncManager.TAG, msg)
 }
