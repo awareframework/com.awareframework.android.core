@@ -1,6 +1,7 @@
 package com.awareframework.android.core.db
 
 import android.content.Context
+import com.awareframework.android.core.db.model.DbSyncConfig
 import com.awareframework.android.core.model.AwareData
 import com.awareframework.android.core.model.AwareObject
 
@@ -48,5 +49,7 @@ abstract class Engine(
     abstract fun <T : AwareObject> save(data: T, tableName: String? = null, id: Long? = null): Thread
     abstract fun removeAll(): Thread
     abstract fun close()
+    abstract fun startSync(tableName: String, configDb: DbSyncConfig = DbSyncConfig())
+    abstract fun stopSync()
 }
 

@@ -17,6 +17,9 @@ interface AwareDataDao {
     @Query("select * from awareData where tableName = :tableName")
     fun getAll(tableName: String): List<AwareDataEntity>
 
+    @Query("select * from awareData where tableName = :tableName order by timestamp asc limit :batchSize")
+    fun get(tableName: String, batchSize: Int): List<AwareDataEntity>
+
     @Query("select * from awareData where id = :id")
     fun findById(id: Long): AwareDataEntity
 
@@ -31,6 +34,9 @@ interface AwareDataDao {
 
     @Delete
     fun delete(data: AwareDataEntity)
+
+    @Delete
+    fun deleteAll(data: List<AwareDataEntity>)
 
     @Query("DELETE FROM awareData")
     fun deleteAll()

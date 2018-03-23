@@ -2,10 +2,13 @@ package com.awareframework.android.core.db
 
 import android.content.Context
 import android.database.sqlite.SQLiteException
+import com.awareframework.android.core.db.model.DbSyncConfig
 import com.awareframework.android.core.db.room.AwareDataEntity
 import com.awareframework.android.core.db.room.AwareRoomDatabase
 import com.awareframework.android.core.model.AwareData
 import com.awareframework.android.core.model.AwareObject
+import com.github.kittinunf.fuel.httpPost
+import com.google.gson.Gson
 import kotlin.concurrent.thread
 
 /**
@@ -75,5 +78,29 @@ class RoomEngine(
     override fun close() {
         db?.close()
         db = null
+    }
+
+    override fun startSync(tableName: String, config: DbSyncConfig) {
+        val data = db?.AwareDataDao()?.get(tableName, config.batchSize)
+        val httpPost = host?.httpPost()
+
+        if (httpPost != null && data != null) {
+            httpPost.header(Pair("Content Type", "application/json"))
+            httpPost.body(Gson().toJson(data))
+
+            httpPost.responseString { _, _, result ->
+                result.fold({
+                    if (config.removeAfterSync) {
+                        db?.AwareDataDao()?.deleteAll(data)
+                    }
+                }, {
+                    it.printStackTrace()
+                })
+            }
+        }
+    }
+
+    override fun stopSync() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

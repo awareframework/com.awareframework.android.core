@@ -36,11 +36,7 @@ abstract class AwareSensor : Service() {
         sensorSyncReceiver = null
     }
 
-    open fun onSync(intent: Intent?) {
-        // TODO (sercant): pass parameters directly to this function instead of passing intent
-        // TODO (sercant): parameters needs to be passed to the engine too.
-//        dbEngine?.sync()
-    }
+    abstract fun onSync(intent: Intent?)
 
     abstract class SensorBroadcastReceiver : BroadcastReceiver() {
         companion object {
