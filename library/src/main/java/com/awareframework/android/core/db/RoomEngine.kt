@@ -7,8 +7,10 @@ import com.awareframework.android.core.db.room.AwareDataEntity
 import com.awareframework.android.core.db.room.AwareRoomDatabase
 import com.awareframework.android.core.model.AwareData
 import com.awareframework.android.core.model.AwareObject
+import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.httpPost
 import com.google.gson.Gson
+import java.util.*
 import kotlin.concurrent.thread
 
 /**
@@ -80,27 +82,78 @@ class RoomEngine(
         db = null
     }
 
+    private var syncTasks: WeakHashMap<String, DataSyncHelper> = WeakHashMap()
+
     override fun startSync(tableName: String, config: DbSyncConfig) {
-        val data = db?.AwareDataDao()?.get(tableName, config.batchSize)
-        val httpPost = host?.httpPost()
+        val syncHelper = syncTasks[tableName]
 
-        if (httpPost != null && data != null) {
-            httpPost.header(Pair("Content Type", "application/json"))
-            httpPost.body(Gson().toJson(data))
+        syncHelper?.stopSync()
 
-            httpPost.responseString { _, _, result ->
+        host ?: return
+
+        val newSyncHelper = DataSyncHelper(this, host, tableName, config)
+        newSyncHelper.start()
+
+        syncTasks[tableName] = newSyncHelper
+    }
+
+    override fun stopSync() {
+        syncTasks.keys.forEach {
+            val syncHelper = syncTasks[it]
+            syncHelper?.stopSync()
+
+            syncTasks[it] = null
+        }
+    }
+
+    private class DataSyncHelper(
+            val engine: RoomEngine,
+            host: String,
+            var tableName: String,
+            var config: DbSyncConfig
+    ) : Thread() {
+
+        var syncing: Boolean = false
+
+        var activeRequest: Request = host.httpPost()
+
+        override fun run() {
+            val syncCount = engine.db?.AwareDataDao()?.count(tableName) ?: 0
+
+            for (i in 0..syncCount) {
+                if (!syncing) break
+
+                val data = engine.db?.AwareDataDao()?.get(tableName, config.batchSize)
+
+                data ?: break
+
+                activeRequest.header(Pair("Content Type", "application/json"))
+                activeRequest.body(Gson().toJson(data))
+
+                // waits for the response
+                val (_, _, result) = activeRequest.responseString()
+
+                // TODO (sercant): check the result comes from the server as content as well.
                 result.fold({
                     if (config.removeAfterSync) {
-                        db?.AwareDataDao()?.deleteAll(data)
+                        engine.db?.AwareDataDao()?.deleteAll(data)
                     }
                 }, {
                     it.printStackTrace()
                 })
             }
-        }
-    }
 
-    override fun stopSync() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            syncing = false
+        }
+
+        fun stopSync() {
+            syncing = false
+            activeRequest.cancel()
+        }
+
+        override fun interrupt() {
+            stopSync()
+            super.interrupt()
+        }
     }
 }

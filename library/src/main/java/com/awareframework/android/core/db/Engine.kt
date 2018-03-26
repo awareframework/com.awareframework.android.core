@@ -49,7 +49,7 @@ abstract class Engine(
     abstract fun <T : AwareObject> save(data: T, tableName: String? = null, id: Long? = null): Thread
     abstract fun removeAll(): Thread
     abstract fun close()
-    abstract fun startSync(tableName: String, configDb: DbSyncConfig = DbSyncConfig())
+    abstract fun startSync(tableName: String, config: DbSyncConfig = DbSyncConfig())
     abstract fun stopSync()
 }
 

@@ -43,6 +43,8 @@ class DbSyncManagerTest {
         val syncManager = DbSyncManager.Builder(appContext).setSyncInterval(0.1f).setWifiOnly(false).setDebug(true).build()
         syncManager.start()
 
+        DbSyncManager.syncDb(true)
+
         Thread.sleep(10000)
 
         check(invokeCount > 0)

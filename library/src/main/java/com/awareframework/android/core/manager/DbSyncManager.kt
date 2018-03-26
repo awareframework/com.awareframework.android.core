@@ -38,6 +38,10 @@ class DbSyncManager private constructor(
         internal fun stopService(context: Context) {
             context.stopService(Intent(context, DbSyncManagerService::class.java))
         }
+
+        fun syncDb(force: Boolean = false) {
+            DbSyncManagerService.instance?.onHandle(force)
+        }
     }
 
     fun start() {
@@ -46,10 +50,6 @@ class DbSyncManager private constructor(
         logd("Starting DbSyncManagerService with config:\n" + config.toString())
 
         startService(context)
-    }
-
-    fun syncDb(force: Boolean = false) {
-        DbSyncManagerService.instance?.onHandle(force)
     }
 
 
@@ -136,23 +136,25 @@ class DbSyncManager private constructor(
             logd( "Attempting to sync.")
 
             var shouldBroadcast = true
-            if (CONFIG.wifiOnly && !isWifiConnected()) {
-                shouldBroadcast = false
+            if (!force) {
+                if (CONFIG.wifiOnly && !isWifiConnected()) {
+                    shouldBroadcast = false
 
-                logd( "Wifi is not connected aborting sync.")
-            }
+                    logd("Wifi is not connected aborting sync.")
+                }
 
 
-            if (CONFIG.batteryChargingOnly && !isCharging()) {
-                shouldBroadcast = false
+                if (CONFIG.batteryChargingOnly && !isCharging()) {
+                    shouldBroadcast = false
 
-                logd( "Battery is not charging aborting sync.")
-            }
+                    logd("Battery is not charging aborting sync.")
+                }
 
-            if (shouldBroadcast) {
-                sendBroadcast(Intent(AwareSensor.SensorSyncReceiver.SYNC))
+                if (shouldBroadcast) {
+                    sendBroadcast(Intent(AwareSensor.SensorSyncReceiver.SYNC))
 
-                logd("Sending sync broadcast!")
+                    logd("Sending sync broadcast!")
+                }
             }
 
             handler?.postDelayed(runnable, CONFIG.intervalInMiliseconds())

@@ -20,6 +20,9 @@ interface AwareDataDao {
     @Query("select * from awareData where tableName = :tableName order by timestamp asc limit :batchSize")
     fun get(tableName: String, batchSize: Int): List<AwareDataEntity>
 
+    @Query("select count(*) from awareData where tableName = :tableName")
+    fun count(tableName: String) : Int
+
     @Query("select * from awareData where id = :id")
     fun findById(id: Long): AwareDataEntity
 

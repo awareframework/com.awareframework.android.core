@@ -10,8 +10,8 @@ interface ISensorController {
     // TODO: document
 
     fun start()
-    fun sync()
-    fun isEnabled()
+    fun sync(force: Boolean = false)
+    fun isEnabled() : Boolean
     fun enable()
     fun disable()
     fun stop()
