@@ -31,6 +31,9 @@ dependencies {
 ## Extending to a new AWARE module
 
 Aware-core provides you with many basic classes that you can extends and start your very own module.
+
+### Extending a sensor controller
+
 First of all, you may want to make a controller class to manage the service that will be run to
 collect the data you want. This controller class will give the programmer an instance to interact
 with. This way we aim to achieve the abstraction between the service itself and the interface.
@@ -68,6 +71,8 @@ class Accelerometer (
     }
 }
 ```
+
+### Extending a sensor configuration
 
 Further more, you are provided with a base configuration class called `SensorConfig` which you can then extend to add specific configurations you need for the new module.
 
@@ -107,6 +112,9 @@ data class AccelerometerConfig(
 ```
 
 We suggest you to follow a builder pattern to prepare the controller and it's configuration.
+
+### Extending a sensor sevice
+
 After this point you are ready to extend a `AwareSensor` if you module needs a service running to collect data. `AwareSensor` class provides you with a database engine `dbEngine`, an `onSync`
 function called by the `DbSyncManager` for letting you know that it's time to send the data to the server, and a `SensorBroadcastReceiver` which you can extend and register as a broadcast receiver to
 receive broadcasts such as `SENSOR_START_ENABLED`, and `SENSOR_STOP_ALL`. Here you can also add your
@@ -131,8 +139,7 @@ class AccelerometerSensor : AwareSensor() {
 
     // Override onSync to let the engine know what and how to sync the data to the server.
     override fun onSync(intent: Intent?) {
-        dbEngine?.startSync(AccelerometerEvent.TABLE_NAME)
-        dbEngine?.startSync(AccelerometerDevice.TABLE_NAME, DbSyncConfig(removeAfterSync = false))
+        // Your sync logic here, example in the later section.
     }
 
     override fun onDestroy() {
@@ -152,6 +159,7 @@ class AccelerometerSensor : AwareSensor() {
                         startService(context)
                     }
                 }
+
                 Accelerometer.ACTION_AWARE_ACCELEROMETER_START -> {
                     startService(context)
                 }
@@ -168,5 +176,47 @@ class AccelerometerSensor : AwareSensor() {
         }
     }
 }
+```
 
+### Storing data using the provided database engine
+
+Aware core provides you with a easy to use database engine for you basic data storage
+and syncing needs. In order to store data in the database we first need to create our
+own data model by extending `AwareObject`.
+
+```kotlin
+open class AccelerometerEvent(
+        var x: Float = 0f,
+        var y: Float = 0f,
+        var z: Float = 0f,
+        var eventTimestamp: Long = 0L,
+        var accuracy: Int = 0,
+        jsonVersion : Int = 1
+) : AwareObject(jsonVersion = jsonVersion) {
+
+    companion object {
+        const val TABLE_NAME = "accelerometerEvent"
+    }
+
+}
+```
+
+Then in your implementation you can simply call `dbEngine.save(data, tableName)`
+to store your data.
+
+```kotlin
+fun saveBuffer(dataBuffer: ArrayList<AccelerometerEvent>) {
+    val data: Array<AccelerometerEvent> = dataBuffer.toTypedArray()
+    dbEngine?.save(dataBuffer, AccelerometerEvent.TABLE_NAME)
+}
+``` 
+
+When the `DbSyncManager` calls `onSync` method on the sensor implementation, you
+should tell the engine which data and how they should be synced to the server.
+
+```kotlin
+override fun onSync(intent: Intent?) {
+    dbEngine?.startSync(AccelerometerEvent.TABLE_NAME)
+    dbEngine?.startSync(AccelerometerDevice.TABLE_NAME, DbSyncConfig(removeAfterSync = false))
+}
 ```
