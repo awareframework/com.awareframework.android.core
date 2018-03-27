@@ -7,7 +7,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 # AWARE Android
 
-This repository contains the the core classes to use while implementing an aware module. 
+This repository contains the the core classes to use while implementing an aware module.
 
 ## Example usage
 
@@ -24,6 +24,149 @@ In your app `build.gradle` add the dependency to the accelerometer.
 
 ```gradle
 dependencies {
-    compile 'com.github.awareframework:com.aware.android.core:-SNAPSHOT'
+    compile 'com.github.awareframework:com.aware.android.core:master-SNAPSHOT'
 }
+```
+
+## Extending to a new AWARE module
+
+Aware-core provides you with many basic classes that you can extends and start your very own module.
+First of all, you may want to make a controller class to manage the service that will be run to
+collect the data you want. This controller class will give the programmer an instance to interact
+with. This way we aim to achieve the abstraction between the service itself and the interface.
+
+We have defined the functions that are necessary to have for a controller class in `ISensorController` interface.
+
+```kotlin
+class Accelerometer (
+        private val context: Context,
+        config: AccelerometerConfig = AccelerometerConfig()
+) : ISensorController {
+
+    override fun start() {
+        // start your AwareSensor service.
+    }
+
+    override fun stop() {
+        // stop your AwareSensor service.
+    }
+
+    override fun sync(force: Boolean) { // force = false by default
+        // send sync call to your AwareSensor service or to DbSyncManager directly.
+    }
+
+    override fun isEnabled() : Boolean {
+        // return the related config field
+    }
+
+    override fun enable() {
+        // alter the related config field
+    }
+
+    override fun disable() {
+        // alter the related config field
+    }
+}
+```
+
+Further more, you are provided with a base configuration class called `SensorConfig` which you can then extend to add specific configurations you need for the new module.
+
+```kotlin
+data class AccelerometerConfig(
+            /**
+             * Accelerometer interval in hertz per second: e.g.,
+             * 0 - fastest
+             * 1 - sample per second
+             * 5 - sample per second
+             * 20 - sample per second
+             */
+            var interval: Int = 5,
+
+            /**
+             * Period to save data in minutes. (optional)
+             */
+            var period: Float = 1f,
+
+            /**
+             * Accelerometer threshold (float).  Do not record consecutive points if
+             * change in value of all axes is less than this.
+             */
+            var threshold: Float = 0f,
+
+            /**
+             * For real-time observation of the sensor data collection.
+             */
+            var sensorObserver: SensorObserver? = null,
+
+            /**
+             * Should we keep a wake lock.
+             * NOTE: Any related permission handling should be taken care of beforehand.
+             */
+            var wakeLockEnabled: Boolean = true
+    ) : SensorConfig(dbPath = "aware_accelerometer", enabled = true)
+```
+
+We suggest you to follow a builder pattern to prepare the controller and it's configuration.
+After this point you are ready to extend a `AwareSensor` if you module needs a service running to collect data. `AwareSensor` class provides you with a database engine `dbEngine`, an `onSync`
+function called by the `DbSyncManager` for letting you know that it's time to send the data to the server, and a `SensorBroadcastReceiver` which you can extend and register as a broadcast receiver to
+receive broadcasts such as `SENSOR_START_ENABLED`, and `SENSOR_STOP_ALL`. Here you can also add your
+own actions to listen to, which may for example broadcasted from your sensor controller class.
+
+```kotlin
+class AccelerometerSensor : AwareSensor() {
+
+    override fun onCreate() {
+        super.onCreate()
+
+        // You need to initialize the dbEngine instance here
+        dbEngine = Engine.Builder(applicationContext)
+                .setPath(CONFIG.dbPath)
+                .setType(CONFIG.dbType)
+                .setEncryptionKey(CONFIG.dbEncryptionKey)
+                .setHost(CONFIG.dbHost)
+                .build()
+
+        // Your module logic here
+    }
+
+    // Override onSync to let the engine know what and how to sync the data to the server.
+    override fun onSync(intent: Intent?) {
+        dbEngine?.startSync(AccelerometerEvent.TABLE_NAME)
+        dbEngine?.startSync(AccelerometerDevice.TABLE_NAME, DbSyncConfig(removeAfterSync = false))
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        dbEngine?.close()
+    }
+
+    // An example broadcast receiver for sensor events
+    class AccelerometerBroadcastReceiver : AwareSensor.SensorBroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (context == null)
+                return
+
+            when (intent?.action) {
+                AwareSensor.SensorBroadcastReceiver.SENSOR_START_ENABLED -> {
+                    if (CONFIG.enabled) {
+                        startService(context)
+                    }
+                }
+                Accelerometer.ACTION_AWARE_ACCELEROMETER_START -> {
+                    startService(context)
+                }
+
+                AwareSensor.SensorBroadcastReceiver.SENSOR_STOP_ALL,
+                Accelerometer.ACTION_AWARE_ACCELEROMETER_STOP -> {
+                    stopService(context)
+                }
+
+                Accelerometer.ACTION_AWARE_ACCELEROMETER_LABEL -> {
+                    AccelerometerSensor.CONFIG.label = intent.getStringExtra(Accelerometer.ACTION_AWARE_ACCELEROMETER_LABEL)
+                }
+            }
+        }
+    }
+}
+
 ```
