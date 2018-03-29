@@ -36,10 +36,10 @@ interface AwareDataDao {
     fun update(data: AwareDataEntity)
 
     @Delete
-    fun delete(data: AwareDataEntity)
+    fun delete(data: AwareDataEntity) : Int
 
     @Delete
-    fun deleteAll(data: List<AwareDataEntity>)
+    fun deleteData(data: List<AwareDataEntity>) : Int
 
     @Query("DELETE FROM awareData")
     fun deleteAll()
