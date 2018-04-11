@@ -39,7 +39,7 @@ class RoomEngine(
 
                 val awareData = arrayListOf<AwareDataEntity>()
                 data.forEach {
-                    awareData.add(AwareDataEntity(data = AwareData(it,  table)))
+                    awareData.add(AwareDataEntity(data = AwareData(it, table)))
                 }
                 db().AwareDataDao().insertAll(awareData.toTypedArray())
             } catch (e: Exception) {
@@ -53,7 +53,7 @@ class RoomEngine(
         return thread {
             try {
                 val table = tableName ?: path
-                db().AwareDataDao().insert(AwareDataEntity(id = id, data = AwareData(data,  table)))
+                db().AwareDataDao().insert(AwareDataEntity(id = id, data = AwareData(data, table)))
             } catch (e: Exception) {
                 // TODO (sercant): user changed the password for the db. Handle it!
                 e.printStackTrace()
@@ -139,7 +139,7 @@ class RoomEngine(
 
         override fun run() {
             val entryCount = engine.db().AwareDataDao().count(tableName)
-            val syncCount =  if (entryCount > config.batchSize) entryCount / config.batchSize else 1
+            val syncCount = if (entryCount > config.batchSize) entryCount / config.batchSize else 1
 //            Log.d("test", "Will sync table $tableName, $syncCount times.")
 
             for (i in 0..syncCount) {
@@ -149,8 +149,11 @@ class RoomEngine(
 
                 if (data.isEmpty()) break
 
+                val combinedData = combineData(data)
+                combinedData ?: continue
+
                 activeRequest.header(Pair("Content-Type", "application/json"))
-                activeRequest.body(Gson().toJson(data))
+                activeRequest.body(Gson().toJson(combinedData))
 
                 // waits for the response
                 val (_, _, result) = activeRequest.responseString()
@@ -163,7 +166,7 @@ class RoomEngine(
                             //TODO (sercant): log that there is something wrong.
                         }
                     }
-                },{
+                }, {
                     it.printStackTrace()
                 })
             }
@@ -179,6 +182,19 @@ class RoomEngine(
         override fun interrupt() {
             stopSync()
             super.interrupt()
+        }
+
+        fun combineData(data: List<AwareData>): AwareData? {
+            if (data.isEmpty()) return null
+
+            val dataString = "[${data.joinToString { it.data }}]"
+
+            return AwareData().apply {
+                this.timestamp = System.currentTimeMillis()
+                this.tableName = data[0].tableName
+                this.deviceId = data[0].deviceId
+                this.data = dataString
+            }
         }
     }
 }
