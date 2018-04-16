@@ -7,6 +7,8 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 # AWARE Android
 
+[![jitpack-badge](https://jitpack.io/v/awareframework/com.aware.android.core.svg)](https://jitpack.io/#awareframework/com.aware.android.core)
+
 This repository contains the the core classes to use while implementing an aware module.
 
 ## Example usage
