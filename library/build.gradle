@@ -17,17 +17,17 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
     // Support Dependencies
-    implementation "com.android.support:appcompat-v7:$support_libs"
+    api "com.android.support:appcompat-v7:$support_libs"
 
     // ROOM
-    implementation "android.arch.persistence.room:runtime:$room"
+    api "android.arch.persistence.room:runtime:$room"
     kapt "android.arch.persistence.room:compiler:$room"
-    implementation "com.commonsware.cwac:saferoom:$saferoom"
+    api "com.commonsware.cwac:saferoom:$saferoom"
 
-    implementation "com.google.code.gson:gson:$gson"
-    implementation "com.github.kittinunf.fuel:fuel-android:$fuel"
+    api "com.google.code.gson:gson:$gson"
+    api "com.github.kittinunf.fuel:fuel-android:$fuel"
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 android {
