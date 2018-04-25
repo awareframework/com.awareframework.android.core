@@ -17,6 +17,9 @@ interface AwareDataDao {
     @Query("select * from awareData where tableName = :tableName")
     fun getAll(tableName: String): List<AwareDataEntity>
 
+    @Query("select * from awareData where tableName = :tableName order by timestamp desc limit :n")
+    fun getLatest(tableName: String, n: Int): AwareDataEntity
+
     @Query("select * from awareData where tableName = :tableName order by timestamp asc limit :batchSize")
     fun get(tableName: String, batchSize: Int): List<AwareDataEntity>
 

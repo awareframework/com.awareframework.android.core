@@ -69,6 +69,10 @@ class RoomEngine(
         return db().AwareDataDao().get(tableName, batchSize)
     }
 
+    override fun getLatest(tableName: String, n: Int): AwareData? {
+        return db().AwareDataDao().getLatest(tableName, n)
+    }
+
     override fun remove(data: List<AwareData>): Thread {
         return thread {
             try {
