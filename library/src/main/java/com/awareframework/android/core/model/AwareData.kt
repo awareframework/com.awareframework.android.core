@@ -1,5 +1,7 @@
 package com.awareframework.android.core.model
 
+import com.google.gson.Gson
+
 /**
  * Class decription
  *
@@ -25,4 +27,14 @@ open class AwareData (
             other.tableName,
             other.deviceId
     )
+
+    inline fun <reified T: AwareObject> alterData(block: (data: T) -> Unit) {
+        val temp = Gson().fromJson(data, T::class.java)
+        block(temp)
+        this.data = Gson().toJson(temp)
+    }
+
+    inline fun <reified T: AwareObject> withData(block: (data: T) -> Unit) {
+        block(Gson().fromJson(data, T::class.java))
+    }
 }
