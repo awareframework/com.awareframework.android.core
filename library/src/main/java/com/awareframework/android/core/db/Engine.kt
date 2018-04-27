@@ -49,6 +49,7 @@ abstract class Engine(
 
     abstract fun <T : AwareObject> save(data: Array<T>, tableName: String? = null) : Thread
     abstract fun <T : AwareObject> save(data: T, tableName: String? = null, id: Long? = null): Thread
+    abstract fun <T : AwareData> update(data: T): Thread
     abstract fun removeAll(): Thread
     abstract fun remove(data: List<AwareData>): Thread
     abstract fun close()

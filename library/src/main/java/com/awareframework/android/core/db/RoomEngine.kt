@@ -61,6 +61,19 @@ class RoomEngine(
         }
     }
 
+    override fun <T : AwareData> update(data: T): Thread {
+        return thread {
+            try {
+                if (data is AwareDataEntity) {
+                    db().AwareDataDao().update(data)
+                }
+            } catch (e: Exception) {
+                // TODO (sercant): user changed the password for the db. Handle it!
+                e.printStackTrace()
+            }
+        }
+    }
+
     override fun getAll(tableName: String): List<AwareData>? {
         return db().AwareDataDao().getAll(tableName)
     }
