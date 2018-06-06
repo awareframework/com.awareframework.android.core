@@ -43,9 +43,9 @@ abstract class Engine(
         }
     }
 
-    abstract fun get(tableName: String, batchSize: Int): List<AwareData>?
-    abstract fun getAll(tableName: String): List<AwareData>?
-    abstract fun getLatest(tableName: String, n: Int = 1): AwareData?
+    abstract fun get(tableName: String, batchSize: Int, callback: (List<AwareData>?) -> Unit): Thread
+    abstract fun getAll(tableName: String, callback: (List<AwareData>?) -> Unit): Thread
+    abstract fun getLatest(tableName: String, n: Int = 1, callback: (AwareData?) -> Unit): Thread
 
     abstract fun <T : AwareObject> save(data: Array<T>, tableName: String? = null) : Thread
     abstract fun <T : AwareObject> save(data: T, tableName: String? = null, id: Long? = null): Thread

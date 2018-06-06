@@ -74,16 +74,22 @@ class RoomEngine(
         }
     }
 
-    override fun getAll(tableName: String): List<AwareData>? {
-        return db().AwareDataDao().getAll(tableName)
+    override fun getAll(tableName: String, callback: (List<AwareData>?) -> Unit): Thread {
+        return thread {
+            callback(db().AwareDataDao().getAll(tableName))
+        }
     }
 
-    override fun get(tableName: String, batchSize: Int): List<AwareData>? {
-        return db().AwareDataDao().get(tableName, batchSize)
+    override fun get(tableName: String, batchSize: Int, callback: (List<AwareData>?) -> Unit): Thread {
+        return thread {
+            callback(db().AwareDataDao().get(tableName, batchSize))
+        }
     }
 
-    override fun getLatest(tableName: String, n: Int): AwareData? {
-        return db().AwareDataDao().getLatest(tableName, n)
+    override fun getLatest(tableName: String, n: Int, callback: (AwareData?) -> Unit): Thread {
+        return thread {
+            callback(db().AwareDataDao().getLatest(tableName, n))
+        }
     }
 
     override fun remove(data: List<AwareData>): Thread {
@@ -157,6 +163,9 @@ class RoomEngine(
         override fun run() {
             val entryCount = engine.db().AwareDataDao().count(tableName)
             val syncCount = if (entryCount > config.batchSize) entryCount / config.batchSize else 1
+            var lastData: AwareData? = null
+            if (config.keepLastData)
+                lastData = engine.db().AwareDataDao().getLatest(tableName, 1)
 //            Log.d("test", "Will sync table $tableName, $syncCount times.")
 
             for (i in 0..syncCount) {

@@ -8,5 +8,8 @@ package com.awareframework.android.core.db.model
  */
 data class DbSyncConfig(
         val removeAfterSync: Boolean = true,
-        val batchSize: Int = 100
+        val batchSize: Int = 100,
+        val markAsSynced: Boolean = false,
+        val skipSyncedData: Boolean = false,
+        val keepLastData: Boolean = false
 )
