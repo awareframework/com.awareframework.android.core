@@ -5,16 +5,16 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'com.github.dcendents.android-maven'
 
 project.ext {
-    saferoom = System.getenv("saferoom") ?: "0.3.2"
-    room = System.getenv("room") ?: "1.0.0"
+    saferoom = System.getenv("saferoom") ?: "0.4.2"
+    room = System.getenv("room") ?: "1.1.0"
     fuel = System.getenv("fuel") ?: "1.12.1"
     gson = System.getenv("gson") ?: "2.8.2"
 }
 
 dependencies {
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     // Support Dependencies
     implementation "com.android.support:appcompat-v7:$support_libs"
