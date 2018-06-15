@@ -187,8 +187,12 @@ class RoomEngine(
                 // TODO (sercant): check the result comes from the server as content as well.
                 result.fold({
                     if (config.removeAfterSync) {
-                        val rowCount = engine.db().AwareDataDao().deleteData(data)
-                        if (rowCount != data.size) {
+                        var dataToRemove = data
+                        if (lastData != null)
+                            dataToRemove = dataToRemove.filter { it != lastData }
+
+                        val rowCount = engine.db().AwareDataDao().deleteData(dataToRemove)
+                        if (rowCount != dataToRemove.size) {
                             //TODO (sercant): log that there is something wrong.
                         }
                     }
