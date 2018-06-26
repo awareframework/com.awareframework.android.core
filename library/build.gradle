@@ -6,7 +6,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 
 project.ext {
     saferoom = System.getenv("saferoom") ?: "0.4.2"
-    room = System.getenv("room") ?: "1.1.0"
+    room = System.getenv("room") ?: "1.0.0"
     fuel = System.getenv("fuel") ?: "1.12.1"
     gson = System.getenv("gson") ?: "2.8.2"
 }
