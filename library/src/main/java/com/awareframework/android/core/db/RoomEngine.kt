@@ -158,7 +158,7 @@ class RoomEngine(
 
         var syncing: Boolean = true
 
-        var activeRequest: Request = host.httpPost()
+        val activeRequest: Request = host.httpPost()
 
         override fun run() {
             val entryCount = engine.db().AwareDataDao().count(tableName)
@@ -166,7 +166,6 @@ class RoomEngine(
             var lastData: AwareData? = null
             if (config.keepLastData)
                 lastData = engine.db().AwareDataDao().getLatest(tableName, 1)
-//            Log.d("test", "Will sync table $tableName, $syncCount times.")
 
             for (i in 0..syncCount) {
                 if (!syncing) break
@@ -175,7 +174,13 @@ class RoomEngine(
 
                 if (data.isEmpty()) break
 
-                val combinedData = combineData(data)
+                // TODO (sercant): ugly business regards to deviceId because the server wants deviceId to
+                // be non empty. If there is such an entry with empty device id as first entry the old code
+                // failed to send the data with the correct (recent) deviceId. This should be handled in a
+                // better way then being passed by dbconfig, or searching the most recent deviceId in the data
+
+                val combinedData = combineData(data, tableName, config.deviceId
+                        ?: data.findLast { !it.deviceId.isEmpty() }?.deviceId)
                 combinedData ?: continue
 
                 activeRequest.header(Pair("Content-Type", "application/json"))
@@ -214,15 +219,15 @@ class RoomEngine(
             super.interrupt()
         }
 
-        fun combineData(data: List<AwareData>): AwareData? {
+        fun combineData(data: List<AwareData>, tableName: String, deviceId: String?): AwareData? {
             if (data.isEmpty()) return null
 
             val dataString = "[${data.joinToString { it.data }}]"
 
             return AwareData().apply {
                 this.timestamp = System.currentTimeMillis()
-                this.tableName = data[0].tableName
-                this.deviceId = data[0].deviceId
+                this.tableName = tableName
+                this.deviceId = deviceId ?: "" // TODO (sercant): empty string is not accepted by the server
                 this.data = dataString
             }
         }

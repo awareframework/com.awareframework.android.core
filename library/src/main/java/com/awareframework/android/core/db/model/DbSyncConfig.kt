@@ -11,5 +11,6 @@ data class DbSyncConfig(
         val batchSize: Int = 100,
         val markAsSynced: Boolean = false,
         val skipSyncedData: Boolean = false,
-        val keepLastData: Boolean = false
+        val keepLastData: Boolean = false,
+        val deviceId: String? = null
 )
