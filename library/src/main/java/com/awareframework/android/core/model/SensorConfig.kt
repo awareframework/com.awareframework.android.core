@@ -1,6 +1,5 @@
 package com.awareframework.android.core.model
 
-import android.content.Context
 import com.awareframework.android.core.db.Engine
 
 /**
@@ -11,44 +10,55 @@ import com.awareframework.android.core.db.Engine
  */
 
 open class SensorConfig(
-    /**
-     * Sensor is enabled or not. (optional)
-     */
-    var enabled: Boolean = false,
-
-    /**
-     * Enables logging. (optional)
-     */
-    var debug: Boolean = false,
-
-    /**
-     * Label for the data. (optional)
-     */
-    var label: String = "",
-
-    /**
-     * User given deviceId. (optional)
-     */
-    var deviceId: String = "",
+        /**
+         * Sensor is enabled or not. (optional)
+         */
+        var enabled: Boolean = false,
 
         /**
-     * Encryption key for the database. (optional)
-     */
-    var dbEncryptionKey: String? = null,
+         * Enables logging. (optional)
+         */
+        var debug: Boolean = false,
 
-    /**
-     * Which database to use. (optional)
-     * defaults to NONE, which doesn't preserve any data.
-     */
-    var dbType: Engine.DatabaseType = Engine.DatabaseType.NONE,
+        /**
+         * Label for the data. (optional)
+         */
+        var label: String = "",
 
-    /**
-     * Database name/path. (optional)? TODO (sercant): discuss
-     */
-    var dbPath: String = "aware",
+        /**
+         * User given deviceId. (optional)
+         */
+        var deviceId: String = "",
 
-    /**
-     * Database sync host. (optional)
-     */
-    var dbHost: String? = null
-)
+        /**
+         * Encryption key for the database. (optional)
+         */
+        var dbEncryptionKey: String? = null,
+
+        /**
+         * Which database to use. (optional)
+         * defaults to NONE, which doesn't preserve any data.
+         */
+        var dbType: Engine.DatabaseType = Engine.DatabaseType.NONE,
+
+        /**
+         * Database name/path. (optional)? TODO (sercant): discuss
+         */
+        var dbPath: String = "aware",
+
+        /**
+         * Database sync host. (optional)
+         */
+        var dbHost: String? = null
+) {
+    open fun <T : SensorConfig> replaceWith(config: T) {
+        enabled = config.enabled
+        debug = config.debug
+        label = config.label
+        deviceId = config.deviceId
+        dbEncryptionKey = config.dbEncryptionKey
+        dbType = config.dbType
+        dbPath = config.dbPath
+        dbHost = config.dbHost
+    }
+}

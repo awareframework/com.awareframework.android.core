@@ -14,6 +14,7 @@ This repository contains the the core classes to use while implementing an aware
 ## Example usage
 
 In your root `build.gradle` add the jitpack repository.
+
 ```gradle
 allprojects {
     repositories {
@@ -23,6 +24,7 @@ allprojects {
     }
 }
 ```
+
 In your app `build.gradle` add the dependency to the accelerometer.
 
 ```gradle
