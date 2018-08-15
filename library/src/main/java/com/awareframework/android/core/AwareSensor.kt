@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import com.awareframework.android.core.db.Engine
+import com.awareframework.android.core.model.SensorConfig
 
 
 /**
@@ -26,14 +27,25 @@ abstract class AwareSensor : Service() {
         sensorSyncReceiver = SensorSyncReceiver(this)
         val syncFilter = IntentFilter()
         syncFilter.addAction(SensorSyncReceiver.SYNC)
-        applicationContext.registerReceiver(sensorSyncReceiver, syncFilter)
+        registerReceiver(sensorSyncReceiver, syncFilter)
     }
 
     override fun onDestroy() {
         super.onDestroy()
 
-        applicationContext.unregisterReceiver(sensorSyncReceiver)
+        unregisterReceiver(sensorSyncReceiver)
         sensorSyncReceiver = null
+    }
+
+    fun initializeDbEngine(config: SensorConfig) {
+        dbEngine?.close()
+
+        dbEngine = Engine.Builder(this)
+                .setPath(config.dbPath)
+                .setType(config.dbType)
+                .setHost(config.dbHost)
+                .setEncryptionKey(config.dbEncryptionKey)
+                .build()
     }
 
     abstract fun onSync(intent: Intent?)
