@@ -37,9 +37,9 @@ open class SensorConfig(
 
         /**
          * Which database to use. (optional)
-         * defaults to NONE, which doesn't preserve any data.
+         * defaults to [Engine.DatabaseType.ROOM].
          */
-        var dbType: Engine.DatabaseType = Engine.DatabaseType.NONE,
+        var dbType: Engine.DatabaseType = Engine.DatabaseType.ROOM,
 
         /**
          * Database name/path. (optional)? TODO (sercant): discuss
