@@ -5,18 +5,18 @@ apply plugin: 'kotlin-kapt'
 
 dependencies {
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation "com.android.support.test:runner:$test_runner"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:$espresso_core"
 
     // ROOM
     implementation "android.arch.persistence.room:runtime:$room"
     kapt "android.arch.persistence.room:compiler:$room"
-    implementation "com.commonsware.cwac:saferoom.x:$saferoom"
+    implementation "com.commonsware.cwac:saferoom:$saferoom"
 
     implementation "com.google.code.gson:gson:$gson"
     implementation "com.github.kittinunf.fuel:fuel-android:$fuel"
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 android {
