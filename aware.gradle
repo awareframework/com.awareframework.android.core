@@ -1,0 +1,17 @@
+ext {
+    version_minor = 0
+    version_major = 0
+    version_code = version_major+version_minor
+    version_readable = "5.$version_major.$version_minor"
+
+    compile_sdk = 28
+    target_sdk = 28
+    minimum_sdk = 19
+
+    aware_libs = "master-SNAPSHOT"
+
+    saferoom = "0.5.0"
+    room = "1.1.1" //"1.0.0"
+    fuel = "1.15.1"
+    gson = "2.8.5"
+}
