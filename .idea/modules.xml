@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/android-core.iml" filepath="$PROJECT_DIR$/android-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/library/aware-sensor-core.iml" filepath="$PROJECT_DIR$/library/aware-sensor-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/com.aware.android.core.iml" filepath="$PROJECT_DIR$/com.aware.android.core.iml" />
       <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
     </modules>
   </component>

@@ -8,6 +8,8 @@ dependencies {
     androidTestImplementation "com.android.support.test:runner:$test_runner"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:$espresso_core"
 
+    implementation "com.android.support:appcompat-v7:$support_libs"
+
     // ROOM
     implementation "android.arch.persistence.room:runtime:$room"
     kapt "android.arch.persistence.room:compiler:$room"
