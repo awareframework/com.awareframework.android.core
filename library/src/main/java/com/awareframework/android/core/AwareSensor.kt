@@ -52,8 +52,8 @@ abstract class AwareSensor : Service() {
 
     abstract class SensorBroadcastReceiver : BroadcastReceiver() {
         companion object {
-            const val SENSOR_START_ENABLED = "com.aware.android.sensor.SENSOR_START"
-            const val SENSOR_STOP_ALL = "com.aware.android.sensor.SENSOR_STOP"
+            const val SENSOR_START_ENABLED = "com.awareframework.android.sensor.SENSOR_START"
+            const val SENSOR_STOP_ALL = "com.awareframework.android.sensor.SENSOR_STOP"
 //            const val AWARE_SYNC = "com.aware.android.sensor.AWARE_SYNC"
         }
 
@@ -61,9 +61,8 @@ abstract class AwareSensor : Service() {
     }
 
     class SensorSyncReceiver(val sensor: AwareSensor) : BroadcastReceiver() {
-
         companion object {
-            const val SYNC = "com.aware.android.sensor.SYNC"
+            const val SYNC = "com.awareframework.android.sensor.SYNC"
         }
 
         override fun onReceive(context: Context?, intent: Intent?) {

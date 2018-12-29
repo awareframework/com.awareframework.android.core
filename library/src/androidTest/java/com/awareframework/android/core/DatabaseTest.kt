@@ -1,13 +1,15 @@
 package com.awareframework.android.core
 
-import android.support.test.InstrumentationRegistry
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.rule.GrantPermissionRule
+import androidx.test.runner.AndroidJUnit4
 import com.awareframework.android.core.db.Engine
 import com.awareframework.android.core.model.AwareData
 import com.awareframework.android.core.model.AwareObject
 import junit.framework.TestCase.*
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
@@ -21,6 +23,9 @@ import java.util.*
 @RunWith(AndroidJUnit4::class)
 class DatabaseTest {
 
+    @Rule @JvmField
+    val grantPermissionRule : GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
     private var engine: Engine? = null
     private var encryptedEngine: Engine? = null
 
@@ -31,7 +36,7 @@ class DatabaseTest {
     @Throws(Exception::class)
     fun init() {
         // Context of the app under test.
-        val appContext = InstrumentationRegistry.getTargetContext()
+        val appContext = InstrumentationRegistry.getInstrumentation().context
 
         engine = Engine.Builder(appContext)
                 .setType(Engine.DatabaseType.NONE)
@@ -87,7 +92,7 @@ class DatabaseTest {
     @Throws(Exception::class)
     fun testInsertAllEvents() {
         // Context of the app under test.
-        val appContext = InstrumentationRegistry.getTargetContext()
+        val appContext = InstrumentationRegistry.getInstrumentation().context
         // Create some default events
         val events = ArrayList<AwareObject>()
         for (i in 0..99) {

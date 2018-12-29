@@ -14,7 +14,6 @@ import com.awareframework.android.core.R
  * @date 15/08/2018
  */
 class NotificationUtil {
-
     companion object {
         const val AWARE_NOTIFICATION_ID = "AWARE_NOTIFICATION_ID"
 
@@ -31,7 +30,6 @@ class NotificationUtil {
                     lightColor = Color.BLUE
                     enableVibration(true)
                 }
-
                 notificationManager.createNotificationChannel(channel)
             }
         }
