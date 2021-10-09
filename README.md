@@ -29,7 +29,7 @@ In your app `build.gradle` add the dependency to the accelerometer.
 
 ```gradle
 dependencies {
-    compile 'com.github.awareframework:com.aware.android.core:master-SNAPSHOT'
+    compile 'com.github.awareframework:com.awareframework.android.core:master-SNAPSHOT'
 }
 ```
 
