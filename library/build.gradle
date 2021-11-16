@@ -2,6 +2,7 @@ apply plugin: 'com.android.library'
 
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 dependencies {
     testImplementation 'junit:junit:4.12'
@@ -13,7 +14,8 @@ dependencies {
 
     // ROOM
     implementation "android.arch.persistence.room:runtime:$room"
-    annotationProcessor "android.arch.persistence.room:compiler:$room"
+    // annotationProcessor "android.arch.persistence.room:compiler:$room"
+    kapt "android.arch.persistence.room:compiler:$room"
     implementation "android.arch.lifecycle:common-java8:1.1.1"
     implementation "com.commonsware.cwac:saferoom:$saferoom"
 
