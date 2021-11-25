@@ -158,7 +158,8 @@ class RoomEngine(
 
         var syncing: Boolean = true
 
-        val activeRequest: Request = host.httpPost()
+        // val activeRequest: Request = host.httpPost()
+        val activeRequest: Request = ("$host/$tableName/insert").httpPost()
 
         override fun run() {
             val entryCount = engine.db().AwareDataDao().count(tableName)
@@ -183,8 +184,9 @@ class RoomEngine(
                         ?: data.findLast { !it.deviceId.isEmpty() }?.deviceId)
                 combinedData ?: continue
 
-                activeRequest.header(Pair("Content-Type", "application/json"))
-                activeRequest.body(Gson().toJson(combinedData))
+//                 activeRequest.header(Pair("Content-Type", "application/json"))
+//                 activeRequest.body(Gson().toJson(combinedData))
+                activeRequest.body("device_id="+ combinedData.deviceId + "&data=" + combinedData.data)
 
                 // waits for the response
                 val (_, _, result) = activeRequest.responseString()
